@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "es6", // Set the JavaScript version for emitted JavaScript and included libs.
+    "module": "commonjs", // Specify module code generation
+    "outDir": "./dist", // Redirect output structure to the directory
+    "strict": true, // Enable all strict type-checking options
+    "esModuleInterop": true, // Enables compatibility with Babel/ES module imports
+    "skipLibCheck": true, // Skip type checking of all declaration files (*.d.ts)
+    "forceConsistentCasingInFileNames": true // Disallow inconsistently-cased references to the same file
+  },
+  "include": [
+    "src/**/*" // Include all files in the src folder
+  ],
+  "exclude": [
+    "node_modules", // Exclude the node_modules directory
+    "**/*.spec.ts" // Exclude test files
+  ]
+}
