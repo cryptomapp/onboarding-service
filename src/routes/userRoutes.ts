@@ -1,7 +1,10 @@
 import { Router } from "express";
+import { checkIfUserExists } from "../controllers/userController";
 // Import necessary functions from controllers or services
 
 const router = Router();
+
+router.get("/:id", checkIfUserExists);
 
 router.post("/initialize", async (req, res) => {
   // Handle /initialize logic
