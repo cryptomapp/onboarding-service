@@ -9,7 +9,10 @@ import {
   Keypair,
 } from "@solana/web3.js";
 import { PROGRAM_ID } from "../generated";
-import { createInitializeUserInstruction } from "../generated";
+import {
+  createInitializeUserInstruction,
+  createInitializeUserWithReferrerInstruction,
+} from "../generated";
 import fs from "fs";
 
 export class SolanaService {
@@ -105,6 +108,57 @@ export class SolanaService {
       return signature;
     } catch (error) {
       console.error("Error in initializeUser:", error);
+      throw error;
+    }
+  }
+
+  async initializeUserWithReferrer(
+    userPublicKey: PublicKey,
+    referrerPublicKey: PublicKey
+  ): Promise<string> {
+    try {
+      // Calculate PDAs for the user and referrer accounts
+      const [userAccountPDA] = this.calculatePDA(userPublicKey, "user");
+      const [referrerAccountPDA] = this.calculatePDA(referrerPublicKey, "user");
+
+      // Create the instruction for initializing the user with a referrer
+      const instruction = createInitializeUserWithReferrerInstruction(
+        {
+          userAccount: userAccountPDA,
+          referrerAccount: referrerAccountPDA,
+          userPubkey: userPublicKey,
+          referrer: referrerPublicKey,
+          serviceWallet: this.serviceWallet.publicKey,
+          state: this.stateAddress,
+          systemProgram: SystemProgram.programId,
+        },
+        this.programId
+      );
+
+      const transaction = new Transaction();
+
+      // Fetch the recent blockhash
+      const { blockhash } = await this.connection.getRecentBlockhash(
+        "finalized"
+      );
+      transaction.recentBlockhash = blockhash;
+
+      // Add the instruction to the transaction
+      transaction.add(instruction);
+
+      // Sign the transaction with the service's wallet
+      transaction.sign(this.serviceWallet);
+
+      // Send the transaction
+      const signature = await sendAndConfirmTransaction(
+        this.connection,
+        transaction,
+        [this.serviceWallet]
+      );
+
+      return signature;
+    } catch (error) {
+      console.error("Error in initializeUserWithReferrer:", error);
       throw error;
     }
   }
