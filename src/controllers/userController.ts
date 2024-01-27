@@ -43,3 +43,14 @@ export const checkIfUserExists = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Error checking if user exists" });
   }
 };
+
+export const getUser = async (req: Request, res: Response) => {
+  console.log("req.params.id", req.params.id);
+  try {
+    const userPublicKey = new PublicKey(req.params.id);
+    const user = await solanaService.getUser(userPublicKey);
+    res.status(200).json({ user });
+  } catch (error) {
+    res.status(500).json({ error: "Error getting user" });
+  }
+};

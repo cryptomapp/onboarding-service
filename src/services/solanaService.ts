@@ -8,7 +8,7 @@ import {
   SystemProgram,
   Keypair,
 } from "@solana/web3.js";
-import { PROGRAM_ID } from "../generated";
+import { PROGRAM_ID, User } from "../generated";
 import {
   createInitializeUserInstruction,
   createInitializeUserWithReferrerInstruction,
@@ -34,7 +34,7 @@ export class SolanaService {
       )
     );
     this.stateAddress = new PublicKey(
-      "79PmNZeRkGUhpFMg4pKsJyb5Tt6cyDqbqCQ6ZFckXpTL"
+      "8WC3K3MZrQgUtqNf7dsgBM7d8yW5HCtYhUvqh2hqrs3V"
     );
   }
 
@@ -54,7 +54,6 @@ export class SolanaService {
   }
 
   async checkIfUserExists(userPublicKey: PublicKey): Promise<boolean> {
-    console.log("SolanaService: checkIfUserExists");
     try {
       const [userAccountPDA] = this.calculatePDA(userPublicKey, "user");
       const accountInfo: AccountInfo<Buffer> | null =
@@ -67,10 +66,32 @@ export class SolanaService {
     }
   }
 
+  async getUser(userPublicKey: PublicKey): Promise<User> {
+    try {
+      // Calculate the PDA for the user account
+      const [userAccountPDA] = this.calculatePDA(userPublicKey, "user");
+
+      console.log("1");
+      // Fetch the user account data
+      const user = await User.fromAccountAddress(
+        this.connection,
+        userAccountPDA
+      );
+      console.log("2");
+      console.log("user", user);
+
+      return user;
+    } catch (error) {
+      console.error("Error in getUser:", error);
+      throw error;
+    }
+  }
+
   async initializeUser(userPublicKey: PublicKey): Promise<string> {
     try {
       // Calculate the PDA for the user account
       const [userAccountPDA] = this.calculatePDA(userPublicKey, "user");
+      console.log("userAccountPDA", userAccountPDA.toBase58());
 
       // Create the instruction for initializing the user
       const instruction = createInitializeUserInstruction(
