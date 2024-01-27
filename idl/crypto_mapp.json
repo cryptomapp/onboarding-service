@@ -27,7 +27,11 @@
           "type": "publicKey"
         },
         {
-          "name": "reviewWalletPubkey",
+          "name": "usersWalletPubkey",
+          "type": "publicKey"
+        },
+        {
+          "name": "reviewsWalletPubkey",
           "type": "publicKey"
         }
       ]
@@ -41,9 +45,19 @@
           "isSigner": false
         },
         {
-          "name": "user",
+          "name": "userPubkey",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serviceWallet",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -67,17 +81,24 @@
           "isSigner": false
         },
         {
-          "name": "user",
-          "isMut": true,
-          "isSigner": true
+          "name": "userPubkey",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "referrer",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "We don't need to impose any constraints on the account itself because we're only using the key."
-          ]
+          "isSigner": false
+        },
+        {
+          "name": "serviceWallet",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -311,7 +332,11 @@
             "type": "publicKey"
           },
           {
-            "name": "reviewWalletPubkey",
+            "name": "usersWalletPubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "reviewsWalletPubkey",
             "type": "publicKey"
           },
           {

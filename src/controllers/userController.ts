@@ -4,15 +4,16 @@ import { PublicKey } from "@solana/web3.js";
 
 const solanaService = SolanaService.getInstance();
 
-// export const initializeUser = async (req: Request, res: Response) => {
-//   try {
-//     const userPublicKey = new PublicKey(req.body.userPublicKey);
-//     await solanaService.initializeUser(userPublicKey);
-//     res.status(200).json({ message: "User initialized successfully" });
-//   } catch (error) {
-//     res.status(500).json({ error: "Error initializing user" });
-//   }
-// };
+export const initializeUser = async (req: Request, res: Response) => {
+  console.log("initializeUser req.body", req.body);
+  try {
+    const userPublicKey = new PublicKey(req.body.userPublicKey);
+    await solanaService.initializeUser(userPublicKey);
+    res.status(200).json({ message: "User initialized successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Error initializing user" });
+  }
+};
 
 // export const initializeUserWithReferrer = async (
 //   req: Request,
@@ -34,9 +35,8 @@ const solanaService = SolanaService.getInstance();
 // };
 
 export const checkIfUserExists = async (req: Request, res: Response) => {
-  console.log("UserController: checkIfUserExists");
   try {
-    const userPublicKey = new PublicKey(req.body.userPublicKey);
+    const userPublicKey = new PublicKey(req.params.id);
     const userExists = await solanaService.checkIfUserExists(userPublicKey);
     res.status(200).json({ userExists });
   } catch (error) {
