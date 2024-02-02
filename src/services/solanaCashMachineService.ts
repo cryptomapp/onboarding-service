@@ -1,115 +1,116 @@
-// import {
-//   Connection,
-//   PublicKey,
-//   clusterApiUrl,
-//   Transaction,
-//   sendAndConfirmTransaction,
-//   Keypair,
-// } from "@solana/web3.js";
-// import fs from "fs";
-// import {
-//   createMint,
-//   getOrCreateAssociatedTokenAccount,
-//   mintTo,
-// } from "@solana/spl-token";
+import {
+  Connection,
+  PublicKey,
+  clusterApiUrl,
+  Transaction,
+  sendAndConfirmTransaction,
+  Keypair,
+  TransactionInstruction,
+} from "@solana/web3.js";
+import fs from "fs";
+import {
+  createMint,
+  getOrCreateAssociatedTokenAccount,
+  mintTo,
+} from "@solana/spl-token";
 
-// export class SolanaCashMachineService {
-//   private static instance: SolanaCashMachineService;
-//   private connection: Connection;
-//   private serviceWallet: Keypair;
-//   private customUSDCMint: PublicKey | null;
+export class SolanaCashMachineService {
+  private static instance: SolanaCashMachineService;
+  private connection: Connection;
+  private serviceWallet: Keypair;
+  private customUSDCMint: PublicKey | null;
 
-//   constructor() {
-//     this.connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-//     // todo: read from config (env)
-//     this.serviceWallet = Keypair.fromSecretKey(
-//       Uint8Array.from(
-//         JSON.parse(
-//           fs.readFileSync("/Users/twentone37/my-solana-wallet.json", "utf-8")
-//         )
-//       )
-//     );
-//     this.customUSDCMint = null;
-//   }
+  constructor() {
+    this.connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    // todo: read from config (env)
+    this.serviceWallet = Keypair.fromSecretKey(
+      Uint8Array.from(
+        JSON.parse(
+          fs.readFileSync("/Users/twentone37/my-solana-wallet.json", "utf-8")
+        )
+      )
+    );
+    this.customUSDCMint = null;
+  }
 
-//   // Singleton instance getter
-//   public static getInstance(): SolanaCashMachineService {
-//     if (!SolanaCashMachineService.instance) {
-//       SolanaCashMachineService.instance = new SolanaCashMachineService();
-//     }
-//     return SolanaCashMachineService.instance;
-//   }
+  // Singleton instance getter
+  public static getInstance(): SolanaCashMachineService {
+    if (!SolanaCashMachineService.instance) {
+      SolanaCashMachineService.instance = new SolanaCashMachineService();
+    }
+    return SolanaCashMachineService.instance;
+  }
 
-//   async mintCustomUSDC(toAccount: PublicKey, amount: number): Promise<string> {
-//     const existingMintAddress = process.env.CUSTOM_USDC_MINT; // Example
+  async mintCustomUSDC(toAccount: PublicKey, amount: number): Promise<string> {
+    const existingMintAddress = process.env.CUSTOM_USDC_MINT;
 
-//     if (existingMintAddress) {
-//       this.customUSDCMint = new PublicKey(existingMintAddress);
-//     } else {
-//       // If it doesn't exist, create it
-//       this.customUSDCMint = await createCustomUSDCMint(
-//         this.connection,
-//         this.serviceWallet
-//       );
-//       process.env.CUSTOM_USDC_MINT = this.customUSDCMint.toString();
-//     }
-//     try {
-//       const mintAuthority = this.serviceWallet; // Your service wallet is the mint authority
-//       const mintPublicKey = new PublicKey("Your_Custom_USDC_Mint_Account");
+    if (existingMintAddress) {
+      this.customUSDCMint = new PublicKey(existingMintAddress);
+    } else {
+      // If it doesn't exist, create it
+      this.customUSDCMint = await createCustomUSDCMint(
+        this.connection,
+        this.serviceWallet
+      );
+      process.env.CUSTOM_USDC_MINT = this.customUSDCMint.toString();
+    }
+    try {
+      const mintAuthority = this.serviceWallet; // Your service wallet is the mint authority
 
-//       // Create a mint transaction
-//       const transaction = new Transaction();
+      // Create a mint transaction
+      const transaction = new Transaction();
 
-//       // Get or create the associated token account for the `toAccount`
-//       const toTokenAccount = await getOrCreateAssociatedTokenAccount(
-//         this.connection,
-//         mintAuthority,
-//         mintPublicKey,
-//         toAccount
-//       );
+      // Get or create the associated token account for the `toAccount`
+      const toTokenAccount = await getOrCreateAssociatedTokenAccount(
+        this.connection,
+        mintAuthority,
+        this.customUSDCMint,
+        toAccount
+      );
 
-//       // Add the mintTo instruction
-//       transaction.add(
-//         await mintTo(
-//           this.connection,
-//           mintAuthority,
-//           mintPublicKey,
-//           toTokenAccount.address,
-//           mintAuthority,
-//           amount,
-//           []
-//         )
-//       );
+      // Correctly awaiting the mintTo function to complete and return a TransactionInstruction
+      const mintToInstruction: TransactionInstruction = (await mintTo(
+        this.connection,
+        mintAuthority,
+        this.customUSDCMint,
+        toTokenAccount.address,
+        mintAuthority.publicKey,
+        amount,
+        []
+      )) as unknown as TransactionInstruction;
 
-//       // Fetch the recent blockhash
-//       transaction.recentBlockhash = (
-//         await this.connection.getRecentBlockhash()
-//       ).blockhash;
+      // Add the mintTo instruction to the transaction
+      transaction.add(mintToInstruction);
 
-//       // Sign the transaction
-//       transaction.sign(mintAuthority);
+      // Fetch the recent blockhash
+      transaction.recentBlockhash = (
+        await this.connection.getRecentBlockhash()
+      ).blockhash;
 
-//       // Send the transaction
-//       return await sendAndConfirmTransaction(this.connection, transaction, [
-//         mintAuthority,
-//       ]);
-//     } catch (error) {
-//       console.error("Error in mintCustomUSDC:", error);
-//       throw error;
-//     }
-//   }
-// }
+      // Sign the transaction
+      transaction.sign(mintAuthority);
 
-// async function createCustomUSDCMint(
-//   connection: Connection,
-//   payer: Keypair
-// ): Promise<PublicKey> {
-//   const mint = await createMint(
-//     connection,
-//     payer, // payer of the transaction
-//     payer.publicKey, // mint authority
-//     null, // freeze authority, set to null if not needed
-//     6 // decimals, USDC typically has 6 decimals
-//   );
-//   return mint;
-// }
+      // Send the transaction
+      return await sendAndConfirmTransaction(this.connection, transaction, [
+        mintAuthority,
+      ]);
+    } catch (error) {
+      console.error("Error in mintCustomUSDC:", error);
+      throw error;
+    }
+  }
+}
+
+async function createCustomUSDCMint(
+  connection: Connection,
+  payer: Keypair
+): Promise<PublicKey> {
+  const mint = await createMint(
+    connection,
+    payer, // payer of the transaction
+    payer.publicKey, // mint authority
+    null, // freeze authority, set to null if not needed
+    6 // decimals, USDC typically has 6 decimals
+  );
+  return mint;
+}
