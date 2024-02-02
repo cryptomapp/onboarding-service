@@ -31,6 +31,10 @@
           "type": "publicKey"
         },
         {
+          "name": "merchantsWalletPubkey",
+          "type": "publicKey"
+        },
+        {
           "name": "reviewsWalletPubkey",
           "type": "publicKey"
         }
@@ -133,7 +137,12 @@
           "isSigner": false
         },
         {
-          "name": "user",
+          "name": "userPubkey",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serviceWallet",
           "isMut": true,
           "isSigner": true
         },
@@ -171,7 +180,12 @@
           "isSigner": false
         },
         {
-          "name": "user",
+          "name": "userPubkey",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serviceWallet",
           "isMut": true,
           "isSigner": true
         },
@@ -333,6 +347,10 @@
           },
           {
             "name": "usersWalletPubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "merchantsWalletPubkey",
             "type": "publicKey"
           },
           {

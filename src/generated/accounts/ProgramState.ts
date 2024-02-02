@@ -17,6 +17,7 @@ import * as beet from '@metaplex-foundation/beet'
 export type ProgramStateArgs = {
   daoPubkey: web3.PublicKey
   usersWalletPubkey: web3.PublicKey
+  merchantsWalletPubkey: web3.PublicKey
   reviewsWalletPubkey: web3.PublicKey
   merchantCounter: number
 }
@@ -33,6 +34,7 @@ export class ProgramState implements ProgramStateArgs {
   private constructor(
     readonly daoPubkey: web3.PublicKey,
     readonly usersWalletPubkey: web3.PublicKey,
+    readonly merchantsWalletPubkey: web3.PublicKey,
     readonly reviewsWalletPubkey: web3.PublicKey,
     readonly merchantCounter: number
   ) {}
@@ -44,6 +46,7 @@ export class ProgramState implements ProgramStateArgs {
     return new ProgramState(
       args.daoPubkey,
       args.usersWalletPubkey,
+      args.merchantsWalletPubkey,
       args.reviewsWalletPubkey,
       args.merchantCounter
     )
@@ -154,6 +157,7 @@ export class ProgramState implements ProgramStateArgs {
     return {
       daoPubkey: this.daoPubkey.toBase58(),
       usersWalletPubkey: this.usersWalletPubkey.toBase58(),
+      merchantsWalletPubkey: this.merchantsWalletPubkey.toBase58(),
       reviewsWalletPubkey: this.reviewsWalletPubkey.toBase58(),
       merchantCounter: this.merchantCounter,
     }
@@ -174,6 +178,7 @@ export const programStateBeet = new beet.BeetStruct<
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['daoPubkey', beetSolana.publicKey],
     ['usersWalletPubkey', beetSolana.publicKey],
+    ['merchantsWalletPubkey', beetSolana.publicKey],
     ['reviewsWalletPubkey', beetSolana.publicKey],
     ['merchantCounter', beet.u32],
   ],

@@ -32,3 +32,6 @@ npm-debug.log*
 
 # Solita
 .crates/
+
+# Solana Wallet
+my-solana-wallet.json

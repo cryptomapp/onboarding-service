@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { SolanaService } from "../services/solanaService";
+import { SolanaUserService } from "../services/solanaUserService";
 import { PublicKey } from "@solana/web3.js";
 
-const solanaService = SolanaService.getInstance();
+const solanaService = SolanaUserService.getInstance();
 
 export const initializeUser = async (req: Request, res: Response) => {
   try {

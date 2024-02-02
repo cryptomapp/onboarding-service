@@ -15,8 +15,8 @@ import {
 } from "../generated";
 import fs from "fs";
 
-export class SolanaService {
-  private static instance: SolanaService;
+export class SolanaUserService {
+  private static instance: SolanaUserService;
   private connection: Connection;
   private programId: PublicKey;
   private stateAddress: PublicKey;
@@ -26,24 +26,26 @@ export class SolanaService {
     this.connection = new Connection(clusterApiUrl("devnet"), "confirmed");
     this.programId = new PublicKey(PROGRAM_ID);
     // todo: read from config (env)
+    console.log("Current working directory:", process.cwd());
+
     this.serviceWallet = Keypair.fromSecretKey(
       Uint8Array.from(
-        JSON.parse(
-          fs.readFileSync("/Users/twentone37/my-solana-wallet.json", "utf-8")
-        )
+        JSON.parse(fs.readFileSync("./my-solana-wallet.json", "utf-8"))
       )
     );
+    console.log("xd");
     this.stateAddress = new PublicKey(
-      "8WC3K3MZrQgUtqNf7dsgBM7d8yW5HCtYhUvqh2hqrs3V"
+      "9Zxs8fDSskUJ5S1vEsFe9eraz3f1NsQ83BKpwQvqNHw1"
     );
+    console.log("xd2");
   }
 
   // Singleton instance getter
-  public static getInstance(): SolanaService {
-    if (!SolanaService.instance) {
-      SolanaService.instance = new SolanaService();
+  public static getInstance(): SolanaUserService {
+    if (!SolanaUserService.instance) {
+      SolanaUserService.instance = new SolanaUserService();
     }
-    return SolanaService.instance;
+    return SolanaUserService.instance;
   }
 
   calculatePDA(publicKey: PublicKey, seedPrefix: string): [PublicKey, number] {
