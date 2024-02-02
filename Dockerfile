@@ -26,7 +26,7 @@ WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY package*.json ./
 COPY yarn.lock ./
-COPY ../my-solana-wallet.json /app/
+COPY my-solana-wallet.json /app/
 
 
 # Install only production dependencies using Yarn
