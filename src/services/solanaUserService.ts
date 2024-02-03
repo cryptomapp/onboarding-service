@@ -33,11 +33,9 @@ export class SolanaUserService {
         JSON.parse(fs.readFileSync("./my-solana-wallet.json", "utf-8"))
       )
     );
-    console.log("xd");
     this.stateAddress = new PublicKey(
       "9Zxs8fDSskUJ5S1vEsFe9eraz3f1NsQ83BKpwQvqNHw1"
     );
-    console.log("xd2");
   }
 
   // Singleton instance getter
@@ -60,7 +58,6 @@ export class SolanaUserService {
       const [userAccountPDA] = this.calculatePDA(userPublicKey, "user");
       const accountInfo: AccountInfo<Buffer> | null =
         await this.connection.getAccountInfo(userAccountPDA);
-      console.log("accountInfo", accountInfo); // todo: get userPDA
       return accountInfo !== null; // A non-null accountInfo implies the PDA exists
     } catch (error) {
       console.error("Error in checkIfUserExists:", error);
@@ -73,14 +70,11 @@ export class SolanaUserService {
       // Calculate the PDA for the user account
       const [userAccountPDA] = this.calculatePDA(userPublicKey, "user");
 
-      console.log("1");
       // Fetch the user account data
       const user = await User.fromAccountAddress(
         this.connection,
         userAccountPDA
       );
-      console.log("2");
-      console.log("user", user);
 
       return user;
     } catch (error) {
@@ -93,7 +87,6 @@ export class SolanaUserService {
     try {
       // Calculate the PDA for the user account
       const [userAccountPDA] = this.calculatePDA(userPublicKey, "user");
-      console.log("userAccountPDA", userAccountPDA.toBase58());
 
       // Create the instruction for initializing the user
       const instruction = createInitializeUserInstruction(
