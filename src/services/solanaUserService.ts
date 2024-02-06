@@ -13,7 +13,8 @@ import {
   createInitializeUserInstruction,
   createInitializeUserWithReferrerInstruction,
 } from "../generated";
-import fs from "fs";
+import bs58 from "bs58";
+import { config } from "../config";
 
 export class SolanaUserService {
   private static instance: SolanaUserService;
@@ -25,14 +26,11 @@ export class SolanaUserService {
   constructor() {
     this.connection = new Connection(clusterApiUrl("devnet"), "confirmed");
     this.programId = new PublicKey(PROGRAM_ID);
-    // todo: read from config (env)
-    console.log("Current working directory:", process.cwd());
 
-    this.serviceWallet = Keypair.fromSecretKey(
-      Uint8Array.from(
-        JSON.parse(fs.readFileSync("./my-solana-wallet.json", "utf-8"))
-      )
-    );
+    // Create a new Keypair from the decoded secret key
+    const secretKeyUint8Array = bs58.decode(config.solPrivateKey);
+    this.serviceWallet = Keypair.fromSecretKey(secretKeyUint8Array);
+
     this.stateAddress = new PublicKey(
       "9Zxs8fDSskUJ5S1vEsFe9eraz3f1NsQ83BKpwQvqNHw1"
     );

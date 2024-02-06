@@ -15,6 +15,8 @@ import {
   getOrCreateAssociatedTokenAccount,
   mintTo,
 } from "@solana/spl-token";
+import { config } from "../config";
+import bs58 from "bs58";
 
 export class SolanaCashMachineService {
   private static instance: SolanaCashMachineService;
@@ -24,12 +26,9 @@ export class SolanaCashMachineService {
 
   constructor() {
     this.connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-    // todo: read from config (env)
-    this.serviceWallet = Keypair.fromSecretKey(
-      Uint8Array.from(
-        JSON.parse(fs.readFileSync("my-solana-wallet.json", "utf-8")) // todo: read from config (env)
-      )
-    );
+    // Create a new Keypair from the decoded secret key
+    const secretKeyUint8Array = bs58.decode(config.solPrivateKey);
+    this.serviceWallet = Keypair.fromSecretKey(secretKeyUint8Array);
     this.customUSDCMint = null;
   }
 
@@ -82,7 +81,7 @@ export class SolanaCashMachineService {
 
   async mintCustomUSDC(toAccount: PublicKey, amount: number): Promise<string> {
     // Check if the mint address already exists in the environment variable
-    const existingMintAddress = process.env.CUSTOM_USDC_MINT;
+    const existingMintAddress = config.usdcMintAddress;
 
     // If it exists, use it, otherwise create a new mint and update the environment variable
     if (existingMintAddress) {
