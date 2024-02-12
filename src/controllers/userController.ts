@@ -10,7 +10,7 @@ export const initializeUser = async (req: Request, res: Response) => {
     await solanaService.initializeUser(userPublicKey);
     res.status(200).json({ message: "User initialized successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Error initializing user" });
+    res.status(500).json({ error: "Error initializing user with: " + error });
   }
 };
 
