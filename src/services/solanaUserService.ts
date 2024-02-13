@@ -32,7 +32,7 @@ export class SolanaUserService {
     this.serviceWallet = Keypair.fromSecretKey(secretKeyUint8Array);
 
     this.stateAddress = new PublicKey(
-      "9Zxs8fDSskUJ5S1vEsFe9eraz3f1NsQ83BKpwQvqNHw1"
+      "EcTqAJBJKu6NEGccBSqPoMSFSjFzniG7sWjVqajt5M85"
     );
   }
 
