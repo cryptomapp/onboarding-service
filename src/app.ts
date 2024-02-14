@@ -5,11 +5,11 @@ import cashMachineRoutes from "./routes/cashMachineRoutes";
 import { config } from "./config";
 
 const app = express();
-// app.use(
-//   cors({
-//     origin: config.frontendUrl,
-//   })
-// );
+app.use(
+  cors({
+    origin: [config.frontendUrl, "http://localhost:9000"],
+  })
+);
 app.use(express.json());
 
 // Use the defined routes
