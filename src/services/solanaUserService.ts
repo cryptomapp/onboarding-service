@@ -29,11 +29,9 @@ export class SolanaUserService {
 
     // Create a new Keypair from the decoded secret key
     const secretKeyUint8Array = bs58.decode(config.solPrivateKey);
-    this.serviceWallet = Keypair.fromSecretKey(secretKeyUint8Array);
 
-    this.stateAddress = new PublicKey(
-      "EcTqAJBJKu6NEGccBSqPoMSFSjFzniG7sWjVqajt5M85"
-    );
+    this.serviceWallet = Keypair.fromSecretKey(secretKeyUint8Array);
+    this.stateAddress = new PublicKey(config.stateAddress);
   }
 
   // Singleton instance getter
