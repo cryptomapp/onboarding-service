@@ -14,7 +14,9 @@ export const config = {
   frontendUrl: process.env.FRONTEND_URL || "https://cryptomapp.vercel.app",
 
   // CryptoMapp scripts/initialize_state.js
-  usdcMintAddress: process.env.CUSTOM_USDC_MINT,
+  usdcMintAddress:
+    process.env.CUSTOM_USDC_MINT ||
+    "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU", // Devnet
   stateAddress:
     process.env.STATE_ADDRESS || "5HzkGM1XFoVrrPLjanQ7Le1Aa4iHPf3aivfKLUztmwFn",
 };

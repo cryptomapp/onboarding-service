@@ -8,6 +8,7 @@ import {
   SystemProgram,
   Keypair,
 } from "@solana/web3.js";
+
 import { PROGRAM_ID, User } from "../generated";
 import {
   createInitializeUserInstruction,
@@ -15,6 +16,10 @@ import {
 } from "../generated";
 import bs58 from "bs58";
 import { config } from "../config";
+import {
+  createAssociatedTokenAccountInstruction,
+  getAssociatedTokenAddress,
+} from "@solana/spl-token";
 
 export class SolanaUserService {
   private static instance: SolanaUserService;
@@ -23,13 +28,14 @@ export class SolanaUserService {
   private stateAddress: PublicKey;
   private serviceWallet: Keypair;
 
+  usdcMintAddress = new PublicKey(config.usdcMintAddress);
+
   constructor() {
     this.connection = new Connection(clusterApiUrl("devnet"), "confirmed");
     this.programId = new PublicKey(PROGRAM_ID);
 
     // Create a new Keypair from the decoded secret key
     const secretKeyUint8Array = bs58.decode(config.solPrivateKey);
-
     this.serviceWallet = Keypair.fromSecretKey(secretKeyUint8Array);
     this.stateAddress = new PublicKey(config.stateAddress);
   }
@@ -84,6 +90,17 @@ export class SolanaUserService {
       // Calculate the PDA for the user account
       const [userAccountPDA] = this.calculatePDA(userPublicKey, "user");
 
+      // Get the associated token account address
+      const usdcAccountAddress = await getAssociatedTokenAddress(
+        this.usdcMintAddress,
+        userPublicKey
+      );
+
+      // Check if the USDC account already exists
+      const usdcAccountInfo = await this.connection.getAccountInfo(
+        usdcAccountAddress
+      );
+
       // Create the instruction for initializing the user
       const instruction = createInitializeUserInstruction(
         {
@@ -103,6 +120,17 @@ export class SolanaUserService {
         "finalized"
       );
       transaction.recentBlockhash = blockhash;
+
+      if (!usdcAccountInfo) {
+        // If the USDC account does not exist, add an instruction to create it
+        const createAtaInstruction = createAssociatedTokenAccountInstruction(
+          this.serviceWallet.publicKey, // Payer of the transaction
+          usdcAccountAddress, // Associated Token Account address
+          userPublicKey, // Owner of the new account
+          this.usdcMintAddress // Mint address for the token
+        );
+        transaction.add(createAtaInstruction);
+      }
 
       // Add the instruction to the transaction
       transaction.add(instruction);
@@ -133,6 +161,17 @@ export class SolanaUserService {
       const [userAccountPDA] = this.calculatePDA(userPublicKey, "user");
       const [referrerAccountPDA] = this.calculatePDA(referrerPublicKey, "user");
 
+      // Get the associated token account address
+      const usdcAccountAddress = await getAssociatedTokenAddress(
+        this.usdcMintAddress,
+        userPublicKey
+      );
+
+      // Check if the USDC account already exists
+      const usdcAccountInfo = await this.connection.getAccountInfo(
+        usdcAccountAddress
+      );
+
       // Create the instruction for initializing the user with a referrer
       const instruction = createInitializeUserWithReferrerInstruction(
         {
@@ -154,6 +193,17 @@ export class SolanaUserService {
         "finalized"
       );
       transaction.recentBlockhash = blockhash;
+
+      if (!usdcAccountInfo) {
+        // If the USDC account does not exist, add an instruction to create it
+        const createAtaInstruction = createAssociatedTokenAccountInstruction(
+          this.serviceWallet.publicKey, // Payer of the transaction
+          usdcAccountAddress, // Associated Token Account address
+          userPublicKey, // Owner of the new account
+          this.usdcMintAddress // Mint address for the token
+        );
+        transaction.add(createAtaInstruction);
+      }
 
       // Add the instruction to the transaction
       transaction.add(instruction);
