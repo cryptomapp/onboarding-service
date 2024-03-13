@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy container app to Azure Web App - dchants
+name: Build and deploy container app to Azure Web App - onboarding-service
 
 on:
   push:
@@ -23,14 +23,14 @@ jobs:
       uses: docker/login-action@v2
       with:
         registry: https://cryptomapp.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_b79740a9a79847e6942bfee75f5bf4d2 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_380c3c4b7eb24129ba86b7f9211e49f3 }}
+        username: ${{ secrets.AzureAppService_ContainerUsername_07b8886016534ddd977ec0ad6aea0fdf }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_17edfe9a0087435e9eaccb93da2d3cae }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: cryptomapp.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_b79740a9a79847e6942bfee75f5bf4d2 }}/cryptomapp/onboarding-service:${{ github.sha }}
+        tags: cryptomapp.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_07b8886016534ddd977ec0ad6aea0fdf }}/cryptomapp/cryptomapp/onboarding-service:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -45,7 +45,7 @@ jobs:
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'dchants'
+        app-name: 'onboarding-service'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_959a21bfcb2442f5bd8b18b67f5ab567 }}
-        images: 'cryptomapp.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_b79740a9a79847e6942bfee75f5bf4d2 }}/cryptomapp/onboarding-service:${{ github.sha }}'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_834763437a7f494ea303e6890981174a }}
+        images: 'cryptomapp.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_07b8886016534ddd977ec0ad6aea0fdf }}/cryptomapp/cryptomapp/onboarding-service:${{ github.sha }}'
