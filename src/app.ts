@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import userRoutes from "./routes/userRoutes";
-import cashMachineRoutes from "./routes/cashMachineRoutes";
 import { config } from "./config";
 
 const app = express();
@@ -13,7 +12,6 @@ app.use(
 app.use(express.json());
 
 // Use the defined routes
-app.use("/api/user", userRoutes);
-app.use("/api", cashMachineRoutes);
+app.use("/api", userRoutes);
 
 export default app;
