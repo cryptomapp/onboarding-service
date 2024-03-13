@@ -55,6 +55,24 @@ export class SolanaUserService {
     return PublicKey.findProgramAddressSync(seeds, this.programId);
   }
 
+  async getUserUsdcAccount(
+    userPublicKey: PublicKey
+  ): Promise<[string, boolean]> {
+    // Calculate the expected address for the user's USDC associated token account
+    const usdcAccountAddress = await getAssociatedTokenAddress(
+      this.usdcMintAddress,
+      userPublicKey
+    );
+
+    // Check if the USDC account exists on the blockchain
+    const usdcAccountInfo = await this.connection.getAccountInfo(
+      usdcAccountAddress
+    );
+
+    // Return the USDC account address as a string and a boolean indicating if the account is initialized
+    return [usdcAccountAddress.toString(), usdcAccountInfo !== null];
+  }
+
   async checkIfUserExists(userPublicKey: PublicKey): Promise<boolean> {
     try {
       const [userAccountPDA] = this.calculatePDA(userPublicKey, "user");
