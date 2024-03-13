@@ -12,6 +12,6 @@ app.use(
 app.use(express.json());
 
 // Use the defined routes
-app.use("/api", userRoutes);
+app.use("/api/user", userRoutes);
 
 export default app;
