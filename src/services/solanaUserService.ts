@@ -27,17 +27,17 @@ export class SolanaUserService {
   private programId: PublicKey;
   private stateAddress: PublicKey;
   private serviceWallet: Keypair;
-
-  usdcMintAddress = new PublicKey(config.usdcMintAddress);
+  private usdcMintAddress: PublicKey;
 
   constructor() {
     this.connection = new Connection(clusterApiUrl("devnet"), "confirmed");
     this.programId = new PublicKey(PROGRAM_ID);
 
     // Create a new Keypair from the decoded secret key
-    const secretKeyUint8Array = bs58.decode(config.solPrivateKey);
+    const secretKeyUint8Array = bs58.decode(config.solPrivateKey!);
     this.serviceWallet = Keypair.fromSecretKey(secretKeyUint8Array);
     this.stateAddress = new PublicKey(config.stateAddress);
+    this.usdcMintAddress = new PublicKey(config.usdcMintAddress);
   }
 
   // Singleton instance getter
@@ -74,10 +74,13 @@ export class SolanaUserService {
   }
 
   async checkIfUserExists(userPublicKey: PublicKey): Promise<boolean> {
+    console.log("checkIfUserExists user PK:", userPublicKey);
     try {
       const [userAccountPDA] = this.calculatePDA(userPublicKey, "user");
+      console.log("UserAccountPDA: ", userAccountPDA);
       const accountInfo: AccountInfo<Buffer> | null =
         await this.connection.getAccountInfo(userAccountPDA);
+      console.log("AccountInfo: ", accountInfo);
       return accountInfo !== null; // A non-null accountInfo implies the PDA exists
     } catch (error) {
       console.error("Error in checkIfUserExists:", error);

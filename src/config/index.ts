@@ -1,22 +1,28 @@
+import { Keypair } from "@solana/web3.js";
+import bs58 from "bs58";
 import dotenv from "dotenv";
 dotenv.config();
 
+function createBase58Keypair(
+  secretArrayStr: string | undefined
+): string | undefined {
+  if (!secretArrayStr) return undefined;
+  const secretArray = JSON.parse(secretArrayStr);
+  const secretUint8Array = Uint8Array.from(secretArray);
+  const keypair = Keypair.fromSecretKey(secretUint8Array);
+  return bs58.encode(keypair.secretKey);
+}
+
 export const config = {
-  irysUrl: "https://devnet.irys.xyz",
-
-  solanaProviderUrl: "https://api.devnet.solana.com",
-  solPrivateKey:
-    process.env.SERVICE_WALLET ||
-    "4GVrk3J7GB8a29RqqBG6x9WZieDufp3ngPc6zcRH3JzfQN3WxLjMbgf98feTWdivSoXxM5EqpQQtzZzrAG6qJDMs",
-
+  frontendUrl: process.env.FRONTEND_URL || "https://cryptomapp.vercel.app",
   port: process.env.PORT || 3000,
   mongoUri: process.env.MONGO_URI || "mongodb://localhost:27017/merchants",
-  frontendUrl: process.env.FRONTEND_URL || "https://cryptomapp.vercel.app",
 
-  // CryptoMapp scripts/initialize_state.js
-  usdcMintAddress:
-    process.env.CUSTOM_USDC_MINT ||
-    "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU", // Devnet
+  solanaProviderUrl: "https://api.devnet.solana.com",
+  solPrivateKey: createBase58Keypair(process.env.SERVICE_WALLET),
   stateAddress:
-    process.env.STATE_ADDRESS || "5HzkGM1XFoVrrPLjanQ7Le1Aa4iHPf3aivfKLUztmwFn",
+    process.env.STATE_ADDRESS || "DaeZ1fXW21NSfw2dRdySMRD1CCbnR3G5RLwpbod4vz2v",
+  usdcMintAddress: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+
+  irysUrl: "https://devnet.irys.xyz",
 };
