@@ -18,11 +18,9 @@ export const config = {
   port: process.env.PORT || 3000,
   mongoUri: process.env.MONGO_URI || "mongodb://localhost:27017/merchants",
 
-  solanaProviderUrl: "https://api.devnet.solana.com",
+  solanaProviderUrl: process.env.SOLANA_RPC || "https://api.devnet.solana.com",
   solPrivateKey: createBase58Keypair(process.env.SERVICE_WALLET),
   stateAddress:
     process.env.STATE_ADDRESS || "DaeZ1fXW21NSfw2dRdySMRD1CCbnR3G5RLwpbod4vz2v",
   usdcMintAddress: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
-
-  irysUrl: "https://devnet.irys.xyz",
 };
