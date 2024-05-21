@@ -22,5 +22,5 @@ export const config = {
   solPrivateKey: createBase58Keypair(process.env.SERVICE_WALLET),
   stateAddress:
     process.env.STATE_ADDRESS || "DaeZ1fXW21NSfw2dRdySMRD1CCbnR3G5RLwpbod4vz2v",
-  usdcMintAddress: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+  usdcMintAddress: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
 };

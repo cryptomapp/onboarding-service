@@ -30,7 +30,7 @@ export class SolanaUserService {
   private usdcMintAddress: PublicKey;
 
   constructor() {
-    this.connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    this.connection = new Connection(config.solanaProviderUrl, "confirmed");
     this.programId = new PublicKey(PROGRAM_ID);
 
     // Create a new Keypair from the decoded secret key
