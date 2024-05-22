@@ -7,6 +7,7 @@ import {
   sendAndConfirmTransaction,
   SystemProgram,
   Keypair,
+  ComputeBudgetProgram,
 } from "@solana/web3.js";
 
 import { PROGRAM_ID, User } from "../generated";
@@ -108,21 +109,21 @@ export class SolanaUserService {
 
   async initializeUser(userPublicKey: PublicKey): Promise<string> {
     try {
-      // Calculate the PDA for the user account
+      console.log("initializeUser");
       const [userAccountPDA] = this.calculatePDA(userPublicKey, "user");
+      console.log("userAccountPDA: ", userAccountPDA);
 
-      // Get the associated token account address
       const usdcAccountAddress = await getAssociatedTokenAddress(
         this.usdcMintAddress,
         userPublicKey
       );
+      console.log("usdcAccountAddress: ", usdcAccountAddress);
 
-      // Check if the USDC account already exists
       const usdcAccountInfo = await this.connection.getAccountInfo(
         usdcAccountAddress
       );
+      console.log("usdcAccountInfo: ", usdcAccountInfo);
 
-      // Create the instruction for initializing the user
       const instruction = createInitializeUserInstruction(
         {
           userAccount: userAccountPDA,
@@ -136,35 +137,44 @@ export class SolanaUserService {
 
       const transaction = new Transaction();
 
-      // Fetch the recent blockhash
       const { blockhash } = await this.connection.getLatestBlockhash(
         "finalized"
       );
       transaction.recentBlockhash = blockhash;
 
       if (!usdcAccountInfo) {
-        // If the USDC account does not exist, add an instruction to create it
         const createAtaInstruction = createAssociatedTokenAccountInstruction(
-          this.serviceWallet.publicKey, // Payer of the transaction
-          usdcAccountAddress, // Associated Token Account address
-          userPublicKey, // Owner of the new account
-          this.usdcMintAddress // Mint address for the token
+          this.serviceWallet.publicKey,
+          usdcAccountAddress,
+          userPublicKey,
+          this.usdcMintAddress
         );
         transaction.add(createAtaInstruction);
       }
 
-      // Add the instruction to the transaction
       transaction.add(instruction);
 
-      // Sign the transaction with the service's wallet
+      // Add priority fee
+      const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+        units: 100_000,
+      });
+
+      const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: 10_000,
+      });
+
+      transaction.add(modifyComputeUnits);
+      transaction.add(addPriorityFee);
+
       transaction.sign(this.serviceWallet);
 
-      // Send the transaction
       const signature = await sendAndConfirmTransaction(
         this.connection,
         transaction,
         [this.serviceWallet]
       );
+
+      console.log("confirmed");
 
       return signature;
     } catch (error) {
@@ -225,6 +235,18 @@ export class SolanaUserService {
         );
         transaction.add(createAtaInstruction);
       }
+
+      // Add priority fee
+      const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+        units: 100_000,
+      });
+
+      const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: 10_000,
+      });
+
+      transaction.add(modifyComputeUnits);
+      transaction.add(addPriorityFee);
 
       // Add the instruction to the transaction
       transaction.add(instruction);

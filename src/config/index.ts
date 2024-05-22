@@ -16,7 +16,6 @@ function createBase58Keypair(
 export const config = {
   frontendUrl: process.env.FRONTEND_URL || "https://cryptomapp.vercel.app",
   port: process.env.PORT || 3000,
-  mongoUri: process.env.MONGO_URI || "mongodb://localhost:27017/merchants",
 
   solanaProviderUrl: process.env.SOLANA_RPC || "https://api.devnet.solana.com",
   solPrivateKey: createBase58Keypair(process.env.SERVICE_WALLET),
